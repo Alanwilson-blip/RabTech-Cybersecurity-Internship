@@ -1,86 +1,65 @@
-# Authorized Security Lab — Rules of Engagement
+# Rules of Engagement (RoE)
 
-**Status: DRAFT — NOT AUTHORIZATION TO TEST**
+## 1. Assessment Details
 
-This document defines a proposed, low-impact assessment scope for the local OWASP Juice Shop training instance. It does not grant permission to test. Written approval from the relevant lab owner/supervisor is required before security testing begins.
+- **Internship:** RabTech Cybersecurity Internship
+- **Task:** Task 2 – Authorized Lab Dossier
+- **Assessor:** Alfiya Anjum .A
+- **Assessment date:** 5 November 2026
 
-## 1. Parties and authorization
+## 2. Objective
 
-- Assessor: Alfiya Anjum .A
-- Lab owner / approving representative: **PENDING RabTech/supervisor confirmation**
-- Proposed asset: **LAB-01 — OWASP Juice Shop in Kali Linux under WSL2**
-- Local URL verified: `http://127.0.0.1:3000`
-- Approval reference and date: **PENDING**
-- Approved asset list: only assets explicitly named in the supervisor-approved final inventory.
-- Authorization rule: a locally running application and this draft document are not proof of authorization.
+The objective is to document the authorized training environment, identify potential security threats, and define safe testing boundaries for the lab.
 
-## 2. Environment and network protection evidence
+## 3. Authorized Scope
 
-- Juice Shop returned `HTTP/1.1 200 OK` at `127.0.0.1:3000` on 2026-11-05.
-- The service was observed listening on `*:3000`.
-- WSL configuration: `networkingMode=mirrored`, `firewall=true`.
-- WSL Hyper-V firewall settings: `Enabled=True`, `DefaultInboundAction=Block`, `LoopbackEnabled=True`.
-- The enabled inbound TCP rule listing showed no allow rule for local port 3000.
-- Windows Firewall was enabled for Domain, Private, and Public profiles. Blocked-packet logging was enabled (`LogBlocked=True`) on all three profiles for the follow-up test.
-- A separate-device test was performed on 2026-11-05 while both laptops were connected to the same Wi-Fi: the small laptop (`192.168.31.30`) ran `Test-NetConnection 192.168.31.106 -Port 3000`, which returned `TcpTestSucceeded: False` and `PingSucceeded: False`. A browser attempt to `http://192.168.31.106:3000` did not load.
-- Windows Firewall log evidence: `pfirewall.log` recorded dropped ICMP traffic from `192.168.31.30` to `192.168.31.106` and dropped UDP traffic from that source to that destination on port 137. A targeted search found no matching TCP/3000 DROP entry. Hyper-V firewall settings were reconfirmed as enabled, with default inbound action Block, outbound action Allow, and loopback enabled.
-- **Interpretation and limitation:** Juice Shop was not reachable from the tested second laptop at the time of testing, and Windows Firewall did drop some traffic from that device. The available log does not prove that Windows Firewall dropped the specific TCP/3000 connection. Wi-Fi client isolation, routing, Hyper-V policy, or another network control may also explain the failed application connection. The listener remains bound to `*:3000`; do not describe it as loopback-only or claim universal isolation.
-- Application log location and retention have not been verified.
-- LAB-02 (deliberately vulnerable VM) is not installed or verified and is excluded.
+| Asset | Description | Scope |
+|---|---|---|
+| LAB-01 | OWASP Juice Shop running locally in Kali Linux under WSL2 | Local application assessment only |
+| LAB-02 | Deliberately vulnerable VM | Excluded — not installed or verified |
 
-## 3. Proposed permitted activity (only after written approval)
+The Juice Shop application was locally accessible at `http://127.0.0.1:3000`.
 
-Subject to explicit approval of each item:
-- Confirm local service availability.
-- Review application responses and documented routes using benign requests.
-- Perform manual input-validation and access-control checks using synthetic accounts and data.
-- Capture minimal evidence needed for the report.
-- Record findings, limitations, and remediation recommendations.
+No testing of public websites, third-party systems, or devices without explicit permission is authorized.
 
-Automated scanners, Nmap scans, proxy tools, fuzzing, authenticated testing, and tests that modify application data require explicit approval before use.
+## 4. Testing Boundaries
 
-## 4. Prohibited activity
+- Restrict testing to the locally installed Juice Shop application.
+- Do not perform denial-of-service testing.
+- Do not attack external systems or other devices.
+- Do not access, modify, or disclose real user data.
+- Do not attempt persistence, privilege escalation on the host, or destructive actions.
+- Stop testing if unexpected impact occurs.
 
-- Denial-of-service, stress, or load testing.
-- Destructive payloads or actions likely to damage data or the host.
-- Persistence, malware, credential theft, or credential reuse.
-- Testing college networks, public systems, employer systems, home routers, third-party services, or any unlisted host.
-- Scanning beyond the explicitly approved target and time window.
-- Accessing, copying, or extracting real personal data, secrets, or unrelated files.
-- Publishing evidence containing IP addresses, credentials, cookies, tokens, personal data, or other sensitive details.
-- Any activity not explicitly authorized in writing.
+## 5. Connectivity Verification
 
-## 5. Testing window, contacts, and stop conditions
+A separate-device connectivity test was performed on 5 November 2026.
 
-- Approved start/end date and time: **PENDING**
-- Permitted tools and rate limits: **PENDING**
-- Emergency contact and escalation channel: **PENDING**
-- Evidence retention/deletion date: **PENDING**
+- The small laptop (test device) attempted to access the big laptop (Juice Shop host) on TCP port 3000.
+- The TCP connection test failed.
+- Browser access to the host's Juice Shop address also failed.
+- Windows Firewall logs showed dropped ICMP and UDP traffic from the test device.
+- No TCP port 3000 DROP entry was identified in the inspected log.
 
-Stop immediately if traffic reaches an unapproved host, the service becomes unstable, real personal data or secrets appear, network exposure or target ownership is unclear, or the supervisor requests a stop. After stopping, cease testing, preserve only minimal relevant evidence, and notify the supervisor.
+**Conclusion:** The application was not reachable from the tested second device during this test. The exact reason for the failed TCP connection was not established. This does not prove that every possible network path is isolated.
 
-## 6. Evidence handling
+## 6. Safety and Data Handling
 
-- Store evidence in a private folder with access limited to the assessor and authorized supervisor.
-- Use synthetic accounts and data only.
-- Redact passwords, tokens, cookies, personal data, and unnecessary network identifiers.
-- Do not publish raw packet captures or sensitive evidence publicly.
-- Record date/time, asset ID, activity, result, and evidence filename.
-- Follow the retention/deletion date provided by the supervisor.
+- Use only test data.
+- Keep the lab environment separate from production systems.
+- Do not publish credentials, tokens, database contents, or sensitive configuration.
+- Redact personal and network identifiers before public sharing unless their disclosure is explicitly required.
 
-## 7. Reporting
+## 7. Approval and Authorization
 
-For each finding, record the finding ID and timestamp, verified asset and affected component, description and severity rationale, safe reproduction steps using synthetic data, impact and limitations, minimal redacted evidence, recommended remediation, and retest status.
+This document records the proposed scope and testing boundaries for the training lab. It is not, by itself, authorization to test systems outside the stated scope.
 
-## 8. Approval checklist
+- **Assessor approval:** Pending
+- **Supervisor approval:** Pending
+- **Approval date:** Pending
 
-- [ ] RabTech/supervisor has confirmed the lab owner and provided written permission.
-- [ ] The exact target and approved assets are listed in the final inventory.
-- [x] WSL Hyper-V firewall default inbound-block policy and local loopback access have been documented.
-- [x] Separate-device reachability test performed: TCP connection and browser access from the small laptop failed on 2026-11-05. Windows Firewall logs show dropped ICMP and UDP traffic from that laptop, but no TCP/3000 DROP entry; the specific blocking mechanism remains unconfirmed.
-- [ ] Permitted tools, rate limits, and testing window are agreed.
-- [ ] Emergency contact and escalation channel are recorded.
-- [ ] Evidence retention/deletion requirements are agreed.
-- [ ] Supervisor approval is recorded before testing begins.
+Testing beyond the locally installed Juice Shop must not begin without explicit written authorization.
 
-**Final reminder:** This is a draft Rules of Engagement document, not authorization. Do not conduct further security testing until the supervisor has approved the final scope in writing.
+## 8. Final Declaration
+
+The assessment is limited to the documented training environment. Any expansion of scope requires prior approval from the responsible authority.
