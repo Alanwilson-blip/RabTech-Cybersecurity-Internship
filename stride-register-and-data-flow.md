@@ -10,8 +10,8 @@
 - Service: TCP port 3000; an HTTP `200 OK` response was observed on 2026-11-05.
 - Database file observed: `~/juice-shop/data/juiceshop.sqlite` (270,336 bytes in the directory listing on 2026-11-05).
 - Network exposure: the process/socket inspection showed a listener on `*:3000`. Windows WSL Hyper-V firewall was enabled with `DefaultInboundAction=Block` and `LoopbackEnabled=True`; the enabled inbound TCP rule listing showed no allow rule for local port 3000. Local access to `127.0.0.1:3000` returned HTTP 200.
-- Separate-device test on 2026-11-05: from the small laptop (`192.168.31.30`) on the same Wi-Fi, `Test-NetConnection 192.168.31.106 -Port 3000` returned `TcpTestSucceeded=False` and `PingSucceeded=False`; a browser attempt to `http://192.168.31.106:3000` did not load.
-- Follow-up firewall evidence: Windows Firewall blocked-packet logging was enabled on Domain, Private, and Public profiles. `pfirewall.log` recorded DROP ICMP from `192.168.31.30` to `192.168.31.106` and DROP UDP from that source to that destination on port 137. A targeted search found no TCP/3000 DROP entry. Hyper-V firewall was reconfirmed enabled with default inbound action Block, outbound action Allow, and loopback enabled.
+- Separate-device test on 2026-11-05: from the small laptop (test device) on the same Wi-Fi, `Test-NetConnection` to the big laptop (Juice Shop host), TCP port 3000, returned `TcpTestSucceeded=False` and `PingSucceeded=False`. A browser attempt to access the host's port 3000 did not load.
+- Follow-up firewall evidence: Windows Firewall blocked-packet logging was enabled on Domain, Private, and Public profiles. `pfirewall.log` recorded DROP ICMP traffic from the small laptop to the big laptop and DROP UDP traffic from the same source to the same destination on port 137. A targeted search found no TCP/3000 DROP entry. Hyper-V firewall was reconfirmed enabled with default inbound action Block, outbound action Allow, and loopback enabled.
 - Interpretation: the service was not reachable from that test device at that time, and Windows Firewall dropped some traffic from that device. The logs do not establish that Windows Firewall dropped the specific TCP/3000 connection. Wi-Fi client isolation, routing, Hyper-V policy, or another network control may explain the failure; not all possible network paths are proven isolated.
 - Application log location and retention: not verified.
 - Data contents: not inspected for this inventory; do not assume all records are synthetic.
@@ -19,7 +19,7 @@
 ## 2. STRIDE threat register
 
 | ID | STRIDE category | Example abuse case | Asset / boundary | Likelihood | Impact | Initial risk | Mitigation priority | Mitigation / validation | Safe stop condition |
-|---|---|---|---|---|---|---|---|---|
+|---|---|---|---|---|---|---|---|---|---|
 | S-01 | Spoofing | A user attempts to impersonate another account using a forged or stolen session token | Browser-to-application authentication boundary | Medium | High | High | **P1 — Critical** | Use only approved synthetic accounts; validate server-side session handling; never reuse real credentials | Stop if real credentials or third-party identity systems are involved |
 | T-01 | Tampering | A user modifies a request to alter another user's training data | Browser/API-to-application boundary; SQLite-backed application data | Medium | Medium | Medium | **P2 — High** | Use synthetic data; validate input and enforce server-side authorization; preserve a clean lab copy | Stop if data outside the approved test dataset could be changed |
 | R-01 | Repudiation | An application action cannot be attributed to an actor or timestamp | Application-to-audit/logging boundary | Medium | Medium | Medium | **P2 — High** | Confirm available audit events and timestamps; protect logs from unauthorized modification | Stop if testing would require deleting or altering real logs |
@@ -53,7 +53,7 @@ flowchart LR
 1. **Browser-to-application boundary:** HTTP requests and user-supplied input are untrusted.
 2. **Application-to-database boundary:** database access should occur through the application; direct database changes are outside routine testing unless explicitly approved.
 3. **Application-to-logging boundary:** log destination, contents, and retention have not yet been verified.
-4. **Lab-to-external-network boundary:** external systems are excluded from this assessment. A same-Wi-Fi test from a second laptop could not reach TCP port 3000 and the browser request did not load. Windows Firewall logged dropped ICMP and UDP traffic from that laptop, but no TCP/3000 DROP entry was found. This supports restricted reachability from the tested device and confirms some traffic was dropped by Windows Firewall, but the cause of the specific TCP/3000 failure and all other possible network paths remain unverified.
+4. **Lab-to-external-network boundary:** external systems are excluded from this assessment. A same-Wi-Fi test from the small laptop could not reach TCP port 3000 on the big laptop, and the browser request did not load. Windows Firewall logged dropped ICMP and UDP traffic from that laptop, but no TCP/3000 DROP entry was found. This supports restricted reachability from the tested device and confirms some traffic was dropped by Windows Firewall, but the cause of the specific TCP/3000 failure and all other possible network paths remain unverified.
 
 ## 5. Outstanding verification
 
